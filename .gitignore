@@ -1,4 +1,7 @@
 secret.txt
 *.csv
+*.xlsx
 __pycach__/
+*.pyc
 .env
+.ipynb_checlpoints/ 
