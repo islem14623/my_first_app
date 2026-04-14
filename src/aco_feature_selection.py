@@ -11,7 +11,7 @@ from sklearn.metrics import classification_report, confusion_matrix, f1_score
 warnings.filterwarnings('ignore')
 
 
-def load_data(sample_size=50000):
+def load_data(sample_size=100000):
     print("Loading dataset...")
     path = "/home/islem/Documents/IIot_project/archive/Edge-IIoTset dataset/Selected dataset for ML and DL/DNN-EdgeIIoT-dataset.csv"
     
