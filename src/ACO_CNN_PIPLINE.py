@@ -38,20 +38,8 @@ print(f"Classes: {class_names}")
 # 2. ACO Feature Selection
 # ============================
 print("\n[2] Running ACO Feature Selection...")
-result = aco_feature_selection(X, y, n_ants=20, iterations=10)
-
-# Safe extraction of selected features (handles tuple or array return)
-if isinstance(result, tuple):
-    # Take the first item that looks like feature indices
-    for item in result:
-        if isinstance(item, (list, np.ndarray)) and len(item) > 0:
-            selected_features = np.array(item).flatten()
-            break
-    else:
-        selected_features = np.array([])
-else:
-    selected_features = np.array(result).flatten()
-
+selected_features, _ = aco_feature_selection(X, y, n_ants=20, iterations=10)
+selected_features = selected_features.astype(int)
 print(f"ACO successfully selected {len(selected_features)} features")
 print(f"Selected feature indices: {selected_features.tolist()}")
 
@@ -61,12 +49,13 @@ print(f"Selected feature indices: {selected_features.tolist()}")
 print("\n[3] Preparing data with ACO-selected features...")
 X_selected = X.iloc[:, selected_features].values
 
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_selected)
-
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42, stratify=y
+    X_selected, y, test_size=0.2, random_state=42, stratify=y
 )
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test  = scaler.transform(X_test)
 
 # Reshape for CNN (samples, features, 1)
 X_train_cnn = X_train.reshape((X_train.shape[0], X_train.shape[1], 1))

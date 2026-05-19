@@ -1,4 +1,49 @@
-secret.txt
+# Large files - don't upload
+*.keras
+*.h5
+*.pkl
+*.csv
+*.zip
+*.tar.gz
+
+# Datasets
+data/
+datasets/
+*.parquet
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Conda
+ids_env/
+.conda/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+report.log
+
+# Results
+results/
+figures/
+docs/secret.txt
 *.csv
 *.xlsx
 __pycach__/

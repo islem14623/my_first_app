@@ -5,7 +5,7 @@ import time
 import warnings
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 
 warnings.filterwarnings('ignore')
@@ -33,10 +33,6 @@ def load_data(sample_size=100000):
     y = le.fit_transform(data['Attack_label'])
     
     X = data.drop(columns=['Attack_label'])
-    
-    # Scaling
-    scaler = StandardScaler()
-    X = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
     
     print(f"Features: {X.shape[1]} | Classes: {class_names}")
     return X, y, class_names

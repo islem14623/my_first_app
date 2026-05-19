@@ -71,12 +71,16 @@ print(f"Feature selection time: {end_time - start_time:.2f} seconds")
 # 6. Train-Test Split + Scaling
 # ==============================
 print("\n[4] Splitting data and scaling...")
-std_scaler = StandardScaler()
-X_final = std_scaler.fit_transform(X.iloc[:, selected_indices])
+X_selected = X.iloc[:, selected_indices].values
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X_final, y, test_size=0.2, random_state=42, stratify=y
+    X_selected, y, test_size=0.2, random_state=42, stratify=y
 )
+
+std_scaler = StandardScaler()
+X_train = std_scaler.fit_transform(X_train)
+X_test  = std_scaler.transform(X_test)
+
 print(f"Train shape: {X_train.shape}")
 print(f"Test shape:  {X_test.shape}")
 

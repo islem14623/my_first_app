@@ -5,23 +5,23 @@ PSO Feature Selection + CNN Classifier
 Balanced version for good accuracy and reasonable false alarms
 """
 
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 
+import joblib
 from pso_feature_selection import load_data, pso_feature_selection
 
 print("="*90)
 print("FINAL PFE - PSO FEATURE SELECTION + CNN (Balanced)")
 print("="*90)
 
-# 1. Load Data
+# 1. Load Data  (already StandardScaled inside load_data)
 X, y, class_names = load_data(sample_size=None)
 
 # 2. PSO Feature Selection
@@ -33,28 +33,25 @@ best_solution, best_accuracy, selected_features = pso_feature_selection(
 # 3. Prepare Selected Features
 X_selected = X.iloc[:, selected_features].values
 
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_selected)
-
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42, stratify=y
+    X_selected, y, test_size=0.2, random_state=42, stratify=y
 )
 
 X_train_cnn = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
 X_test_cnn  = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
 
-# 4. CNN Model - Balanced
+# 4. CNN Model - Balanced binary classifier
 print("\nBuilding Balanced CNN Model...")
 
 model = keras.Sequential([
     keras.layers.Conv1D(64, 3, activation='relu', padding='same', input_shape=(X_train_cnn.shape[1], 1)),
     keras.layers.BatchNormalization(),
     keras.layers.MaxPooling1D(2),
-    
+
     keras.layers.Conv1D(128, 3, activation='relu', padding='same'),
     keras.layers.BatchNormalization(),
     keras.layers.MaxPooling1D(2),
-    
+
     keras.layers.Flatten(),
     keras.layers.Dense(128, activation='relu'),
     keras.layers.Dropout(0.35),
@@ -63,7 +60,7 @@ model = keras.Sequential([
     keras.layers.Dense(1, activation='sigmoid')
 ])
 
-# Balanced class weight
+# Higher weight on attack class to boost recall
 class_weight = {0: 1.0, 1: 2.8}
 
 model.compile(
@@ -102,4 +99,6 @@ print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 
 model.save("final_pso_cnn_balanced_model.keras")
+joblib.dump(selected_features, "pso_selected_features.pkl")
 print("\nModel saved as 'final_pso_cnn_balanced_model.keras'")
+print("Selected features saved as 'pso_selected_features.pkl'")

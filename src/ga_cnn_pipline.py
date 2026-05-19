@@ -16,8 +16,7 @@ from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 
 # Import your GA function
-from ga_feature_selection import genetic_algorithm
-from pso_feature_selection import load_data
+from ga_feature_selection import genetic_algorithm, load_data
 
 print("="*90)
 print("FINAL PFE SUBMISSION - GENETIC ALGORITHM + CNN")
@@ -33,24 +32,9 @@ print(f"Total features: {X.shape[1]}")
 print("\n[2] Running Genetic Algorithm Feature Selection...")
 
 # Call GA and handle the return values safely
-result = genetic_algorithm(X, y, n_features=X.shape[1], pop_size=20, generations=10)
-
-# Debug: see what GA actually returns
-print(f"Type of return value: {type(result)}")
-print(f"Return value: {result}")
-
-# Fix the return handling
-if isinstance(result, tuple):
-    if len(result) == 3:
-        best_solution, best_score, selected_features = result
-    elif len(result) == 2:
-        best_solution, best_score = result
-        selected_features = np.where(best_solution == 1)[0]
-    else:
-        selected_features = result[0] if len(result) > 0 else []
-else:
-    selected_features = result if isinstance(result, (list, np.ndarray)) else []
-
+best_solution, best_score, selected_features = genetic_algorithm(
+    X, y, n_features=X.shape[1], pop_size=20, generations=10
+)
 print(f"GA selected {len(selected_features)} features")
 
 # 3. Prepare Data
@@ -58,12 +42,13 @@ print("\n[3] Preparing data with GA-selected features...")
 
 X_selected = X.iloc[:, selected_features].values
 
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_selected)
-
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42, stratify=y
+    X_selected, y, test_size=0.2, random_state=42, stratify=y
 )
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test  = scaler.transform(X_test)
 
 X_train_cnn = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
 X_test_cnn  = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
