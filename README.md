@@ -1,3 +1,5 @@
+![CI Pipeline](https://github.com/islem14623/my_first_app/actions/workflows/ci.yml/badge.svg)
+
 # IIoT Intrusion Detection System with Nature-Inspired Feature Selection
 
 MLOps project deploying a CNN-based intrusion detection model with PSO feature selection as a REST API.
